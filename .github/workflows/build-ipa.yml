@@ -46,4 +46,3 @@ jobs:
           name: GestaltX-unsigned-IPA
           path: dist/GestaltX-unsigned.ipa
           retention-days: 7
-
