@@ -1,7 +1,7 @@
 
 name: Build GestaltX IPA
 
-'on':
+on:
   workflow_dispatch:
 
 permissions:
