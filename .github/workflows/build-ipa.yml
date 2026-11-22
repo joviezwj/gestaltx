@@ -1,1 +1,49 @@
 
+name: Build GestaltX IPA
+
+'on':
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Check Xcode
+        run: xcodebuild -version
+
+      - name: Build GestaltX
+        run: |
+          xcodebuild \
+            -project GestaltX.xcodeproj \
+            -scheme GestaltX \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package IPA
+        run: |
+          set -e
+          APP_PATH="build/Build/Products/Release-iphoneos/GestaltX.app"
+          test -d "$APP_PATH"
+          mkdir -p Payload dist
+          cp -R "$APP_PATH" Payload/
+          zip -qry dist/GestaltX-unsigned.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: GestaltX-unsigned-IPA
+          path: dist/GestaltX-unsigned.ipa
+          retention-days: 7
+
